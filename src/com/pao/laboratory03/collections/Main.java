@@ -1,5 +1,5 @@
 package com.pao.laboratory03.collections;
-
+import java.util.*;
 /**
  * Exercițiul 1 — Colecții: HashMap și TreeMap
  *
@@ -51,6 +51,55 @@ package com.pao.laboratory03.collections;
 public class Main {
     public static void main(String[] args) {
         // TODO: implementează cele 3 părți de mai sus
+
+        String [] cuvinte= {"java", "python", "java", "c++", "python", "java", "rust", "c++", "go"};
+        Map<String, Integer> frecventa = new HashMap<>();
+        for (String c:cuvinte){
+                frecventa.put(c, frecventa.getOrDefault(c, 0)+1);
+
+
+        }
+        System.out.println("* === PARTEA A: HashMap — frecvența cuvintelor ===");
+        System.out.println("Frecvența cuvinte: " + frecventa);
+        System.out.println("Exista rust? Raspuns:" + frecventa.containsKey("rust"));
+        System.out.println("Afiseaza cheile: "+ frecventa.keySet());
+        System.out.println("Afiseaza valorile: "+ frecventa.values());
+
+
+        for (Map.Entry<String, Integer> entry : frecventa.entrySet()) {
+            System.out.println("  " + entry.getKey() + " => " + entry.getValue());
+        }
+
+        System.out.println();
+        System.out.println("=== PARTEA B: TreeMap — sortare automată ===");
+        TreeMap<String, Integer> treemap1 = new TreeMap<>(frecventa);
+
+        System.out.println("TreeMap ul sortat"+ treemap1);
+
+        System.out.println("Prima cheie: " + treemap1.firstKey());
+        System.out.println("Ultima cheie: " + treemap1.lastKey());
+
+
+        System.out.println();
+        System.out.println("=== PARTEA C: Map cu obiecte ===");
+
+        Map<String, List<String>> mapobj= new HashMap<>();
+
+        mapobj.put("PAOJ", new ArrayList<>(Arrays.asList("Ana", "Mihai", "Ion")));
+        mapobj.put("BD", new ArrayList<>(Arrays.asList("Ana", "Elena")));
+
+        System.out.println("Studenti la PAOJ: "+ mapobj.get("PAOJ"));
+        mapobj.get("BD"). add("Ilinca");
+
+        System.out.println("Studenti la BD(dupa actualizare): "+ mapobj.get("BD"));
+
+
+
+
+
+
+
     }
 }
+
 
