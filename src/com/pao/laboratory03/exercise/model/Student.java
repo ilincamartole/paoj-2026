@@ -1,7 +1,7 @@
-package com.pao.laboratory03.exercise;
+package com.pao.laboratory03.exercise.model;
 
 import com.pao.laboratory03.exceptions.InvalidAgeException;
-import com.pao.laboratory03.exercise.InvalidGradeException;
+import com.pao.laboratory03.exercise.exception.InvalidGradeException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ public class Student {
     private int age;
     private Map<Subject, Double> grades;
 
-    Student(String name, int age){
+    public Student(String name, int age){
         this.name=name;
         if (age<18 || age >60){
             throw new InvalidAgeException("Varsta invalida a studentului: ");
@@ -33,7 +33,7 @@ public class Student {
         return grades;
     }
 
-    void addGrade(Subject subject, double grade){
+    public void addGrade(Subject subject, double grade){
         if (grade <1 || grade > 10)
             throw new InvalidGradeException("Nota trebuie sa fie intre 1 si 10!");
         grades.put(subject, grade);
@@ -41,7 +41,7 @@ public class Student {
 
         }
 
-    double getAverage(){
+    public double getAverage(){
         if (grades.isEmpty()) {
             return 0;
         }

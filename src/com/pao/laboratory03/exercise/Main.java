@@ -1,8 +1,12 @@
 package com.pao.laboratory03.exercise;
 
+import com.pao.laboratory03.exercise.model.Subject;
+import com.pao.laboratory03.exercise.service.StudentService;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
+
 
 /**
  * Exercițiul 4 (Integrator) — Sistem de gestiune studenți + note
@@ -147,8 +151,6 @@ public class Main {
             } catch (NumberFormatException e) {
                 System.out.println("Eroare: Introdu un număr valid.");
             } catch (IllegalArgumentException e) {
-                System.out.println("Eroare: " + e.getMessage());
-            } catch (RuntimeException e) {
                 System.out.println("Eroare: " + e.getMessage());
             }
         }

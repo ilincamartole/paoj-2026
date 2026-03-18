@@ -1,4 +1,4 @@
-package com.pao.laboratory03.exercise;
+package com.pao.laboratory03.exercise.model;
 
 public enum Subject {
     PAOJ("Projramare Avansata pe Obiecte in Java", 5),

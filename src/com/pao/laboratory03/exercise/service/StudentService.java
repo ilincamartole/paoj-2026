@@ -1,6 +1,8 @@
-package com.pao.laboratory03.exercise;
+package com.pao.laboratory03.exercise.service;
 
-import com.pao.laboratory02.exercise4.service.ZooService;
+import com.pao.laboratory03.exercise.exception.StudentNotFoundException;
+import com.pao.laboratory03.exercise.model.Student;
+import com.pao.laboratory03.exercise.model.Subject;
 
 import java.util.*;
 
@@ -20,7 +22,7 @@ public class StudentService {
         return StudentService.Holder.INSTANCE;
     }
 
-    void addStudent(String name, int age){
+    public void addStudent(String name, int age){
         Student s= new Student(name, age);
 
         for (Student stud: students)
@@ -43,26 +45,29 @@ public class StudentService {
         throw new StudentNotFoundException("Nu am gasit studentul cu numele"+ nume);
     }
 
-    void addGrade(String studentName, Subject subject, double grade){
+    public void addGrade(String studentName, Subject subject, double grade){
         Student s;
 
         s=findByName(studentName);
         s.addGrade(subject, grade);
 
     }
-    void printAllStudents(){
+    public void printAllStudents(){
         int cnt=1;
         for (Student s: students){
 
            System.out.println( cnt+ ". "+s.toString());
            cnt++;
+           if(s.getGrades() != null)
+               System.out.println(s.getGrades());
            System.out.println();
+
 
         }
 
     }
 
-    void printTopStudents(){
+    public void printTopStudents(){
         TreeMap<String, Double> treesort = new TreeMap<>(Comparator.reverseOrder());
 
         for (Student s: students){
@@ -77,7 +82,7 @@ public class StudentService {
 
 
     }
-    Map<Subject, Double> getAveragePerSubject(){
+    public Map<Subject, Double> getAveragePerSubject(){
 
         Map<Subject, Double> suma = new HashMap<>();
         Map<Subject,Double> cnt = new HashMap<>();
