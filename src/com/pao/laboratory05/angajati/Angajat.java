@@ -8,7 +8,7 @@ private String nume;
 private Departament departament;
 private double salariu;
 
-Angajat(String nume, Departament departament, double salariu ){
+public Angajat(String nume, Departament departament, double salariu){
     this. nume=nume;
     this.departament=departament;
     this.salariu=salariu;

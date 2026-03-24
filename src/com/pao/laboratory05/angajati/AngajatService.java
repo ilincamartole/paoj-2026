@@ -10,15 +10,15 @@ public class AngajatService {
         this.angajati = new Angajat[0];
     }
 
-    private static class Holder {
-        private static final AngajatService INSTANCE = new AngajatService();
+    public static class Holder {
+        public static final AngajatService INSTANCE = new AngajatService();
     }
 
     public static AngajatService getInstance() {
         return Holder.INSTANCE;
     }
 
-    void addAngajat(Angajat a) {
+    public void addAngajat(Angajat a) {
         Angajat[] temp = new Angajat[angajati.length + 1];
         System.arraycopy(angajati, 0, temp, 0, angajati.length);
         temp[temp.length - 1] = a;
@@ -33,7 +33,7 @@ public class AngajatService {
         }
     }
 
-    void listBySalary() {
+    public void listBySalary() {
         Angajat[] copy = angajati.clone();
         Arrays.sort(copy); // presupune Comparable
 
@@ -42,7 +42,7 @@ public class AngajatService {
         }
     }
 
-    void findByDepartament(String numeDept) {
+    public void findByDepartament(String numeDept) {
         boolean found = false;
 
         for (Angajat a : angajati) {
