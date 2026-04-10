@@ -1,7 +1,7 @@
 package com.pao.laboratory07.exercise1;
 
 import com.pao.laboratory07.exercise1.exceptions.CannotCancelFinalOrderException;
-import com.pao.laboratory07.exercise1.exceptions.CannotRevertInitialOrderStateException;
+import com.pao.laboratory07.exercise1.exceptions.CannotRevertInitialStareComandaException;
 import com.pao.laboratory07.exercise1.exceptions.OrderIsAlreadyFinalException;
 
 import java.util.Scanner;
@@ -11,7 +11,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         // Part A
         // load initial state
-        OrderState initialState = OrderState.valueOf(scanner.next());
+        StareComanda initialState = StareComanda.valueOf(scanner.next());
         Order order = new Order(initialState);
         System.out.println("Initial order state: " + initialState);
 
@@ -35,7 +35,7 @@ public class Main {
                 case undo -> {
                     try {
                         order.undoState();
-                    } catch (CannotRevertInitialOrderStateException e) {
+                    } catch (CannotRevertInitialStareComandaException e) {
                         System.out.println("Cannot undo the initial order state.");
                     }
                 }
