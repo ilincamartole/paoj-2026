@@ -1,11 +1,10 @@
 package com.pao.proiect.SISTEM_LICITATII.service;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
+
 import com.pao.proiect.SISTEM_LICITATII.Licitatie;
 import com.pao.proiect.SISTEM_LICITATII.Oferta;
-
-import java.util.List;
-import java.util.Scanner;
+import com.pao.proiect.SISTEM_LICITATII.exceptions.NuExistaAceastaLicitatie;
+import com.pao.proiect.SISTEM_LICITATII.exceptions.OfertaInvalidaException;
 
 public class LicitatieService {
 
@@ -29,22 +28,22 @@ public class LicitatieService {
     }
 
 
+
+
     public void creazaLicitatie(Licitatie licitatie) {
+
         licitatii.add(licitatie);
         System.out.println("Am creat Licitatia:  " + licitatie);
+        if (!licitatie.getProdus().getSeller()
+                .getIstoricProduse()
+                .contains(licitatie.getProdus())) {
 
-//        int n;
-//        Scanner scanner= new Scanner(System.in);
-//
-//        n=scanner.nextInt();
-//
-//        switch(n){
-//            case 1:
-//              System.out.println("1. Adauga o oferta: ");
-//                System.out.println("Introduceti CNP-ul: ");
-//                String cnp= scanner.next();
-//
-//        }
+            licitatie.getProdus().getSeller()
+                    .getIstoricProduse()
+                    .add(licitatie.getProdus());
+        }
+
+
     }
 
         public void afiseazaLicitatii(){
@@ -52,29 +51,66 @@ public class LicitatieService {
                 System.out.println(i+". "+licitatii.get(i));}
 
         public void ofertaservice(Licitatie l, Oferta o){
+            if (o.getValoare()<l.getMinValue())
+            { throw new OfertaInvalidaException("Oferta prea mica!");}
             l.adaugaOferta(o);
         }
 
-        public void stergeLicitatie(int index){
+        public void stergeLicitatie(int id) {
 
-            if (0<=index && index<=licitatii.size()){
-                licitatii.remove(index);
+            boolean ok = false;
+            for (
+                    int i=0;i< licitatii.size();i++) {
+                if (licitatii.get(i).getProdus().getId() == id) {
+                    licitatii.remove(i);
+                    ok=true;
+                    break;
+
+
+                }
+
             }
-
+            if (ok == false) {
+                throw new NuExistaAceastaLicitatie("Nu exista aceasta licitatie! Incercati alt id?");
+            }
         }
 
     public void cautaDupaNume(String nume) {
-
+        boolean ok=false;
         for (Licitatie l : licitatii) {
             if (l.getProdus().getNume().equalsIgnoreCase(nume)) {
                 System.out.println(l);
+                ok=true;
+
+
             }
+
+        }
+        if (ok==false){
+            throw new NuExistaAceastaLicitatie(" Nu exista licittaii pt un produs cu acest nume!");
         }
 
 
     }
+    public void afiseazaLicitatiiSortate(){
+        List<Licitatie> copy = new ArrayList<>(licitatii);
+        copy.sort(Comparator.comparingInt((Licitatie l) -> l.getOferte().length).reversed());
+
+        for (Licitatie c:copy){
+            System.out.println(c+"\n");
+
+        }
+
+
+
 
     }
+
+
+
+    }
+
+
 
 
 

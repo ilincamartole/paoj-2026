@@ -3,8 +3,8 @@ package com.pao.proiect.SISTEM_LICITATII;
 public class Oferta implements Comparable <Oferta> {
 
     private int valoare;
-    private User buyer;
-    public Oferta(int valoare, User buyer){
+    private Buyer buyer;
+    public Oferta(int valoare, Buyer buyer){
         this. valoare=valoare;
         this.buyer=buyer;
 
@@ -19,5 +19,12 @@ public class Oferta implements Comparable <Oferta> {
     @Override
     public int compareTo(Oferta o) {
         return Integer.compare(this.valoare, o.valoare);
+    }
+
+    public Buyer getBuyer(){
+        return buyer;
+    }
+    public int getValoare(){
+        return valoare;
     }
 }

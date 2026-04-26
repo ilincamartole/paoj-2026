@@ -14,7 +14,9 @@ public abstract class User {
 
     @Override
     public String toString() {
-        return this.nume;
+        return "User: "+this.nume+"\n CNP:"+this.cnp;
+
+
     }
     public String getCnp(){
         return this.cnp;
@@ -23,10 +25,18 @@ public abstract class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof User)) return false;
 
         User user = (User) o;
         return cnp.equals(user.cnp);
     }
+
+    @Override
+    public int hashCode() {
+        return cnp.hashCode();
+    }
+    public String getNume(){
+        return nume;}
 }
+
 
