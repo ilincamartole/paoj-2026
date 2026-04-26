@@ -1,4 +1,4 @@
-package com.pao.proiect.SISTEM_LICITATII;
+package com.pao.proiect.SISTEM_LICITATII.model;
 
 public class Oferta implements Comparable <Oferta> {
 

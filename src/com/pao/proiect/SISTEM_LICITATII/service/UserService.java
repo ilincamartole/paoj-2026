@@ -1,8 +1,7 @@
 package com.pao.proiect.SISTEM_LICITATII.service;
 
-import com.pao.proiect.SISTEM_LICITATII.*;
 import com.pao.proiect.SISTEM_LICITATII.exceptions.UserInexistentException;
-import com.sun.source.tree.Tree;
+import com.pao.proiect.SISTEM_LICITATII.model.*;
 import com.pao.proiect.SISTEM_LICITATII.enums.UserType;
 import com.pao.proiect.SISTEM_LICITATII.enums.Categorie;
 
@@ -11,7 +10,7 @@ import java.util.*;
 
 public class UserService {
 
-    private User[] useri;
+
     TreeMap<UserType, List<User>> map = new TreeMap<>();
 
     private UserService() {
@@ -32,19 +31,26 @@ public class UserService {
     }
 
     public void adaugaUser(User user) {
-
-        List<User> lista = map.get(
-                (user instanceof Seller) ? UserType.SELLER : UserType.BUYER
-        );
-
-        if (!lista.contains(user)) {
-            lista.add(user);
+        if (user == null) {
+            System.out.println("Eroare: Nu poți adăuga un user null.");
+            return;
         }
+
+        for (List<User> listaCurenta : map.values()) {
+            for (User u : listaCurenta) {
+                if (u.getCnp().equals(user.getCnp())) {
+                    System.out.println("Eroare: Userul cu CNP " + user.getCnp() + " exista deja în sistem!");
+                    return;
+                }
+            }
+        }
+
+        UserType tip = (user instanceof Seller) ? UserType.SELLER : UserType.BUYER;
+        map.get(tip).add(user);
+        System.out.println("User adaugat cu succes.");
     }
 
-    public User[] getUseri() {
-        return this.useri;
-    }
+
 
     public void afiseazaUseri() {
 
@@ -82,6 +88,7 @@ public class UserService {
 
     public void categoriePrefBuyeri() {
         TreeMap<Categorie, Integer> map1 = new TreeMap<>();
+
         map1.put(Categorie.MOBILA, 0);
         map1.put(Categorie.ARTA, 0);
         map1.put(Categorie.HAINE, 0);

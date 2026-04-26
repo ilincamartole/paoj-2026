@@ -1,4 +1,4 @@
-package com.pao.proiect.SISTEM_LICITATII;
+package com.pao.proiect.SISTEM_LICITATII.model;
 
 public class Licitatie{
     private Produs produs;
@@ -15,7 +15,7 @@ public class Licitatie{
 
     @Override
     public String toString() {
-        return "Produsul cu id : " + this.produs+ "cu valoare minima: "+ minValue;
+        return  this.getProdus().getId()+". Produsul : " + this.produs+ "\ncu valoare minima: "+ minValue;
     }
 
     public void adaugaOferta(Oferta o){

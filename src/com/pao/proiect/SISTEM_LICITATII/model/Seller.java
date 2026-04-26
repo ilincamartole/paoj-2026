@@ -1,9 +1,9 @@
-package com.pao.proiect.SISTEM_LICITATII;
+package com.pao.proiect.SISTEM_LICITATII.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Seller extends User{
+public class Seller extends User {
 
     private double rating;
     private List<Produs> istoricProduse;

@@ -1,10 +1,8 @@
-package com.pao.proiect.SISTEM_LICITATII;
+package com.pao.proiect.SISTEM_LICITATII.model;
 
 public abstract class User {
     protected String nume;
-    protected String prenume;
     protected String cnp;
-    protected String email;
 
 
     public User(String nume, String cnp){

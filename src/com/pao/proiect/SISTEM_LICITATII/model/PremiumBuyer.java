@@ -1,8 +1,8 @@
-package com.pao.proiect.SISTEM_LICITATII;
+package com.pao.proiect.SISTEM_LICITATII.model;
 
 import com.pao.proiect.SISTEM_LICITATII.enums.Categorie;
 
-public final class PremiumBuyer extends Buyer{
+public final class PremiumBuyer extends Buyer {
 
     final private float discountRate;
 

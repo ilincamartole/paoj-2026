@@ -1,4 +1,4 @@
-package com.pao.proiect.SISTEM_LICITATII;
+package com.pao.proiect.SISTEM_LICITATII.model;
 
 import com.pao.proiect.SISTEM_LICITATII.enums.Categorie;
 
@@ -23,7 +23,7 @@ public class Produs implements Comparable<Produs> {
 
     @Override
     public String toString() {
-        return "ID. "+this.id+"Nume: " + this.nume + "\n Categorie: " + this.categorie + "\n Colectie: " + this.colectie + "\n VAndut de: " + this.seller;
+        return "\nNume: " + this.nume + "\n Categorie: " + this.categorie + "\n Colectie: " + this.colectie + "\n VAndut de: " + this.seller;
     }
 
     public String getNume() {
