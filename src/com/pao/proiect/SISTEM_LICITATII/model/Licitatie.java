@@ -1,12 +1,15 @@
 package com.pao.proiect.SISTEM_LICITATII.model;
 
 public class Licitatie{
+    private final int id_licitatie;
+    private static int generatorID=0;
     private Produs produs;
     private Oferta[] oferte;
     private long minValue;
 
 
     public Licitatie(Produs produs, long minValue){
+        this.id_licitatie=generatorID++;
         this.produs=produs;
         this.oferte= new Oferta[0];
         this.minValue=minValue;

@@ -76,7 +76,7 @@ public class Main {
                 System.out.println("3. Adauga user");
                 System.out.println("4. Afiseaza userii");
                 System.out.println("5. Fa o oferta la o licitatie");
-                System.out.println("6. Sterge o licittaie");
+                System.out.println("6. Sterge o licitaie");
                 System.out.println("7. Cauta o licitatie dupa numele produsului");
                 System.out.println("8. Afiseaza licitatiile sortate descrescator dupa numarul de oferte");
                 System.out.println("9. Afisati care este cea mai cautata categorie a Buyerilor");

@@ -1,11 +1,14 @@
 package com.pao.proiect.SISTEM_LICITATII.model;
 
 public abstract class User {
+    private final int id_user;
+    private static int generatorID = 0;
     protected String nume;
     protected String cnp;
 
 
     public User(String nume, String cnp){
+        this.id_user=generatorID++;
         this.nume=nume;
         this.cnp=cnp;
     }
