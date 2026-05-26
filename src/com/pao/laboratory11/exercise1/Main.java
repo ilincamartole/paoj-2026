@@ -34,13 +34,11 @@ public class Main {
         try {
             run();
         } catch (IOException e) {
-            // Keep deterministic output for checker-based tests.
             System.out.println("ERR IO");
         }
     }
 
     private static void run() throws IOException {
-        // Read dataset and then execute Q commands over the in-memory model.
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String first = readNonEmptyLine(br);
         if (first == null) {
