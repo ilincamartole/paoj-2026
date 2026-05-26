@@ -11,4 +11,8 @@ public final class PremiumBuyer extends Buyer {
         this.discountRate = discountRate;
 
     }
+
+    public float getDiscountRate() {
+        return discountRate;
+    }
 }

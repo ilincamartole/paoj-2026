@@ -15,6 +15,9 @@ public class Seller extends User {
     }
 
 
+    public double getRating() {
+        return rating;
+    }
 
     @Override
     public String toString() {

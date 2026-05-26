@@ -10,11 +10,11 @@ public class Produs implements Comparable<Produs> {
     private String nume;
     private String colectie;
     private Seller seller;
-    private final int id_produs;
+    protected int id_produs;
     private static int generatorID = 0;
 
     public Produs(String nume, Categorie categorie, String colectie, Seller seller) {
-        this.id_produs = generatorID++;
+
         this.nume = nume;
         this.categorie = categorie;
         this.colectie = colectie;

@@ -1,12 +1,11 @@
 package com.pao.proiect.SISTEM_LICITATII.model;
 
 public class Oferta implements Comparable <Oferta> {
-    private final int id_oferta;
+    protected int id_oferta;
     private static int generatorID=0;
     private int valoare;
     private Buyer buyer;
     public Oferta(int valoare, Buyer buyer){
-        this.id_oferta=generatorID++;
         this. valoare=valoare;
         this.buyer=buyer;
 
