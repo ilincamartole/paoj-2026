@@ -215,7 +215,7 @@ public class Main {
                             System.out.println("Introduceti valoarea ofertei:  ");
                             int val = scanner.nextInt();
 
-                            Oferta o = new Oferta(val, buyer);
+                            Oferta o = new Oferta(val, buyer,id);
 
                             serviceL.ofertaservice(serviceL.getLicitatii().get(id), o);
 

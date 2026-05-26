@@ -14,11 +14,19 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
     public void save(Licitatie licitatie) {
         String sql = "INSERT INTO licitatie (id_produs, min_value) VALUES (?, ?)";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setInt(1, licitatie.getProdus().getId());
             pstmt.setLong(2, licitatie.getMinValue());
             pstmt.executeUpdate();
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    // Setează ID-ul generat direct în obiectul Licitatie primit ca parametru
+                    licitatie.setId_licitatie(generatedKeys.getInt(1));
+                }
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -34,6 +42,7 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Licitatie l = new Licitatie(null, rs.getLong("min_value"));
+                    l.setId_licitatie(rs.getInt("id_licitatie"));
                     return Optional.of(l);
                 }
             }
@@ -47,12 +56,15 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
     public List<Licitatie> findAll() {
         List<Licitatie> list = new ArrayList<>();
         String sql = "SELECT * FROM licitatie";
+        // CORECTAT: rs este adăugat direct în resursele blocului try principale
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
-                list.add(new Licitatie(null, rs.getLong("min_value")));
+                Licitatie l = new Licitatie(null, rs.getLong("min_value"));
+                l.setId_licitatie(rs.getInt("id_licitatie"));
+                list.add(l);
             }
         } catch (SQLException e) {
             e.printStackTrace();

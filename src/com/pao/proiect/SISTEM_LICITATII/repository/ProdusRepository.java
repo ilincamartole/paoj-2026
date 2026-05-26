@@ -14,16 +14,24 @@ public class ProdusRepository implements Repository<Produs, Integer> {
     @Override
     public void save(Produs produs) {
         String sql = "INSERT INTO produs (nume, categorie, colectie, id_seller) VALUES (?, ?, ?, ?)";
+        //  Adăugăm Statement.RETURN_GENERATED_KEYS în prepareStatement
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, produs.getNume());
-            pstmt.setString(2, produs.toString()); // Sau metodă de luat String-ul din Enum
-            // Pentru simplitate, presupunem că avem o metodă ajutătoare sau salvăm numele enum-ului
-            // pstmt.setString(2, produs.getCategorie().name());
-            pstmt.setString(3, "Colectie Generica");
-            pstmt.setInt(4, 1); // un ID de seller de test existent în DB
+            pstmt.setString(2, produs.getCategorie().name());
+            pstmt.setString(3, produs.getColectie());
+            pstmt.setInt(4, produs.getSeller().getId_user());
+
             pstmt.executeUpdate();
+
+            //  Extragem cheia generată de MySQL și o punem în obiectul Produs
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    produs.setId_produs(generatedKeys.getInt(1)); // Setează ID-ul generat direct pe entitate!
+                }
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -38,7 +46,14 @@ public class ProdusRepository implements Repository<Produs, Integer> {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    Produs p = new Produs(rs.getString("nume"), Categorie.ARTA, rs.getString("colectie"), null);
+                    // CORECTAT: Reconstruim obiectul cu toate datele REALE venite din tabelă
+                    Produs p = new Produs(
+                            rs.getString("nume"),
+                            Categorie.valueOf(rs.getString("categorie")), // Mapează string-ul din DB înapoi în Enum-ul Java
+                            rs.getString("colectie"),
+                            null // Poți lăsa null seller-ul momentan sau să îl aduci din DB dacă ai nevoie de el în obiect
+                    );
+                    p.setId_produs(rs.getInt("id_produs")); // Setează ID-ul real citit din baza de date
                     return Optional.of(p);
                 }
             }
@@ -54,10 +69,18 @@ public class ProdusRepository implements Repository<Produs, Integer> {
         String sql = "SELECT * FROM produs";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+             ResultSet rs = pstmt.executeQuery()) { // CORECTAT: ResultSet-ul este acum închis corect în try-with-resources general
 
             while (rs.next()) {
-                produse.add(new Produs(rs.getString("nume"), Categorie.ARTA, rs.getString("colectie"), null));
+                // CORECTAT: Nu mai punem ARTA peste tot, ci citim valoarea fiecărui rând
+                Produs p = new Produs(
+                        rs.getString("nume"),
+                        Categorie.valueOf(rs.getString("categorie")),
+                        rs.getString("colectie"),
+                        null
+                );
+                p.setId_produs(rs.getInt("id_produs"));
+                produse.add(p);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -67,13 +90,16 @@ public class ProdusRepository implements Repository<Produs, Integer> {
 
     @Override
     public void update(Produs produs) {
-        String sql = "UPDATE produs SET nume = ?, colectie = ? WHERE id_produs = ?";
+        // CORECTAT: Actualizăm toate câmpurile modificate, nu doar numele, și scoatem textul fix "Colectie Noua"
+        String sql = "UPDATE produs SET nume = ?, categorie = ?, colectie = ? WHERE id_produs = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, produs.getNume());
-            pstmt.setString(2, "Colectie Noua");
-            pstmt.setInt(3, produs.getId());
+            pstmt.setString(2, produs.getCategorie().name());
+            pstmt.setString(3, produs.getColectie());
+            pstmt.setInt(4, produs.getId()); // ID-ul produsului pe care vrem să îl modificăm
+
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

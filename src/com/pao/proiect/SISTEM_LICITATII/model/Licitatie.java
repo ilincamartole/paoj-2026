@@ -19,6 +19,15 @@ public class Licitatie{
         return  this.getProdus().getId()+". Produsul : " + this.produs+ "\ncu valoare minima: "+ minValue;
     }
 
+    public int getId_licitatie() {
+        return id_licitatie;
+    }
+
+
+    public void setId_licitatie(int id_licitatie) {
+        this.id_licitatie = id_licitatie;
+    }
+
     public void adaugaOferta(Oferta o){
 
         Oferta[] temp = new Oferta[oferte.length + 1];

@@ -30,6 +30,14 @@ public abstract class User {
         return cnp.equals(user.cnp);
     }
 
+    public int getId_user() {
+        return id_user;
+    }
+
+    public void setId_user(int id_user) {
+        this.id_user = id_user;
+    }
+
     @Override
     public int hashCode() {
         return cnp.hashCode();

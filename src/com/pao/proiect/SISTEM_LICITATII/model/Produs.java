@@ -26,6 +26,18 @@ public class Produs implements Comparable<Produs> {
         return "\nNume: " + this.nume + "\n Categorie: " + this.categorie + "\n Colectie: " + this.colectie + "\n VAndut de: " + this.seller;
     }
 
+    public Categorie getCategorie() {
+        return categorie;
+    }
+
+    public void setId_produs(int id_produs) {
+        this.id_produs = id_produs;
+    }
+
+    public String getColectie() {
+        return colectie;
+    }
+
     public String getNume() {
         return nume;
     }

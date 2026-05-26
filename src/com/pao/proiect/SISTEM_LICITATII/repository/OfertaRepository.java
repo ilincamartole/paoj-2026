@@ -14,12 +14,20 @@ public class OfertaRepository implements Repository<Oferta, Integer> {
     public void save(Oferta oferta) {
         String sql = "INSERT INTO oferta (valoare, id_buyer, id_licitatie) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setInt(1, oferta.getValoare());
-            pstmt.setInt(2, 1); // ID-ul unui Buyer existent de test
-            pstmt.setInt(3, 1); // ID-ul unei Licitații existente de test
+            pstmt.setInt(2, oferta.getBuyer().getId_user());       // ID-ul moștenit de Buyer de la User
+            pstmt.setInt(3, oferta.getIdLicitatie());         // 🔴 Luat direct din obiectul Oferta!
+
             pstmt.executeUpdate();
+
+            try(ResultSet generatedKeys = pstmt.getGeneratedKeys()){
+                if (generatedKeys.next()) {
+                    // Setează ID-ul generat direct în obiectul Licitatie primit ca parametru
+                    oferta.setId_oferta(generatedKeys.getInt(1));
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -34,7 +42,9 @@ public class OfertaRepository implements Repository<Oferta, Integer> {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    Oferta o = new Oferta(rs.getInt("valoare"), null);
+                    // Reconstituim obiectul citit din baza de date
+                    Oferta o = new Oferta(rs.getInt("valoare"), null, rs.getInt("id_licitatie"));
+                    o.setId_oferta(rs.getInt("id_oferta"));
                     return Optional.of(o);
                 }
             }
@@ -53,7 +63,9 @@ public class OfertaRepository implements Repository<Oferta, Integer> {
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
-                oferte.add(new Oferta(rs.getInt("valoare"), null));
+                Oferta o = new Oferta(rs.getInt("valoare"), null, rs.getInt("id_licitatie"));
+                o.setId_oferta(rs.getInt("id_oferta"));
+                oferte.add(o);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -63,13 +75,14 @@ public class OfertaRepository implements Repository<Oferta, Integer> {
 
     @Override
     public void update(Oferta oferta) {
-        String sql = "UPDATE oferta SET valoare = ? WHERE id_oferta = ?";
+        String sql = "UPDATE oferta SET valoare = ?, id_licitatie = ? WHERE id_oferta = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            // Folosim o valoare de test sau o metodă getId() dacă o adaugi în clasă
             pstmt.setInt(1, oferta.getValoare());
-            pstmt.setInt(2, 1);
+            pstmt.setInt(2, oferta.getIdLicitatie());
+            pstmt.setInt(3, oferta.getId_oferta());
+
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

@@ -5,12 +5,25 @@ public class Oferta implements Comparable <Oferta> {
     private static int generatorID=0;
     private int valoare;
     private Buyer buyer;
-    public Oferta(int valoare, Buyer buyer){
+    private int idLicitatie;
+    public Oferta(int valoare, Buyer buyer, int idLicitatie){
         this. valoare=valoare;
         this.buyer=buyer;
+        this.idLicitatie=idLicitatie;
 
 
     }
+
+    public int getId_oferta() {
+        return id_oferta;
+    }
+
+    public void setId_oferta(int id_oferta) {
+        this.id_oferta = id_oferta;
+    }
+
+    public int getIdLicitatie() { return idLicitatie; }
+    public void setIdLicitatie(int idLicitatie) { this.idLicitatie = idLicitatie; }
 
     @Override
     public String toString() {
@@ -28,4 +41,5 @@ public class Oferta implements Comparable <Oferta> {
     public int getValoare(){
         return valoare;
     }
+
 }

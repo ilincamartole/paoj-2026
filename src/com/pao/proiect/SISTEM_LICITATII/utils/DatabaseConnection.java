@@ -7,44 +7,46 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class DatabaseConnection {
+public final class DatabaseConnection {
+
     // 1. Instanța unică (Singleton)
     private static DatabaseConnection instance;
-    private Connection connection;
 
-    // 2. Constructor privat - previne instanțierea din exterior
+    // Păstrăm doar parametrii de configurare în instanță
+    private String url;
+    private String user;
+    private String pass;
+
+    // 2. Constructor privat — prinde toate excepțiile intern ca să fie curat în exterior
     private DatabaseConnection() {
-        Properties properties = new Properties();
+        Properties props = new Properties();
 
-        // Citim fișierul db.properties din folderul resources
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
-            if (input == null) {
-                System.out.println("Ne pare rău, nu am găsit fișierul db.properties!");
-                return;
+        // Citim db.properties din resources/
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("db.properties")) {
+            if (is == null) {
+                throw new IOException("Nu s-a găsit fișierul db.properties în folderul resources/");
             }
-            properties.load(input);
+            props.load(is);
 
-            String url = properties.getProperty("db.url");
-            String user = properties.getProperty("db.user");
-            String password = properties.getProperty("db.password");
+            this.url = props.getProperty("db.url");
+            this.user = props.getProperty("db.user");
+            this.pass = props.getProperty("db.password");
 
-            // Înregistrăm driverul de MySQL (opțional în versiunile noi, dar sigur pentru facultate)
+            // Încărcăm explicit driverul de MySQL pentru siguranță
             Class.forName("com.mysql.cj.jdbc.Driver");
-
-            // Creăm conexiunea fizică
-            this.connection = DriverManager.getConnection(url, user, password);
-            System.out.println("Conexiunea la baza de date a fost realizată cu succes!");
+            System.out.println("[DB] Configurația bazei de date a fost încărcată cu succes!");
 
         } catch (IOException e) {
-            System.out.println("Eroare la citirea fișierului de proprietăți: " + e.getMessage());
+            System.err.println("[DB] Eroare la citirea fișierului de proprietăți: " + e.getMessage());
         } catch (ClassNotFoundException e) {
-            System.out.println("Driverul JDBC MySQL nu a fost găsit! Adaugă .jar-ul în proiect. " + e.getMessage());
-        } catch (SQLException e) {
-            System.out.println("Eroare la conectarea la baza de date: " + e.getMessage());
+            System.err.println("[DB] Driverul JDBC MySQL nu a fost găsit! " + e.getMessage());
         }
     }
 
-    // 3. Metoda globală de acces pentru Singleton (Thread-safe elementar)
+    /**
+     * 3. Metoda globală de acces pentru Singleton.
+     * Nu mai aruncă nicio excepție (No throws!), deci funcționează perfect în repouri.
+     */
     public static synchronized DatabaseConnection getInstance() {
         if (instance == null) {
             instance = new DatabaseConnection();
@@ -52,22 +54,14 @@ public class DatabaseConnection {
         return instance;
     }
 
-    // Metodă pentru a obține obiectul Connection reutilizabil
+    /**
+     * 4. Returnează o conexiune deschisă NOUĂ către MySQL la fiecare apel.
+     * Aruncă doar SQLException, pe care repository-urile tale o prind deja în catch.
+     */
     public Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            Properties properties = new Properties();
-            try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
-                if (input != null) {
-                    properties.load(input);
-                    String url = properties.getProperty("db.url");
-                    String user = properties.getProperty("db.user");
-                    String password = properties.getProperty("db.password");
-                    this.connection = DriverManager.getConnection(url, user, password);
-                }
-            } catch (IOException e) {
-                throw new SQLException("Nu s-a putut reîncărca db.properties", e);
-            }
+        if (url == null || user == null || pass == null) {
+            throw new SQLException("Configurația bazei de date nu a fost încărcată. Verifică db.properties!");
         }
-        return connection;
+        return DriverManager.getConnection(url, user, pass);
     }
 }
