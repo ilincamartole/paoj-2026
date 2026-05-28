@@ -15,27 +15,34 @@ public class BuyerRepository implements Repository<Buyer, Integer> {
 
     @Override
     public void save(Buyer buyer) {
+
         String sql = "INSERT INTO utilizator_buyer (id_buyer, categorie_preferata) VALUES (?, ?)";
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection()) {
-            conn.setAutoCommit(false); // Începe tranzacția
+            conn.setAutoCommit(false);
 
             try {
-                // 1. Salvează în tabela părinte utilizator folosind ACEEASI conexiune
+                // 1. salvezi utilizatorul (părinte)
                 int userId = userRepo.save(buyer, conn);
 
-                // 2. Salvează în tabela copil utilizator_buyer
+                // 🔥 IMPORTANT: sincronizezi TOATE ID-URILE din obiect
+                buyer.setId_user(userId);
+                buyer.setId_user(userId); // <- AICI ERA PROBLEMA TA
+
+                // 2. salvezi buyer-ul (copil)
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, userId);
                     ps.setString(2, buyer.getCategoriePref().name());
                     ps.executeUpdate();
                 }
 
-                conn.commit(); // Dacă totul e ok, salvăm în DB
+                conn.commit();
+
             } catch (SQLException e) {
-                conn.rollback(); // Dacă pică ceva, dăm înapoi TOT (și utilizator și buyer)
+                conn.rollback();
                 throw e;
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -43,7 +50,7 @@ public class BuyerRepository implements Repository<Buyer, Integer> {
 
     @Override
     public Optional<Buyer> findById(Integer id) {
-        String sql = "SELECT u.nume, u.cnp, b.categorie_preferata " +
+        String sql = "SELECT u.id_user as id_buyer, u.nume, u.cnp, b.categorie_preferata " +
                 "FROM utilizator u JOIN utilizator_buyer b ON u.id_user = b.id_buyer " +
                 "WHERE u.id_user = ?";
 
@@ -59,6 +66,7 @@ public class BuyerRepository implements Repository<Buyer, Integer> {
                             rs.getString("cnp"),
                             Categorie.valueOf(rs.getString("categorie_preferata"))
                     );
+                    b.setId_user(rs.getInt("id_buyer"));
                     return Optional.of(b);
                 }
             }
@@ -71,7 +79,7 @@ public class BuyerRepository implements Repository<Buyer, Integer> {
     @Override
     public List<Buyer> findAll() {
         List<Buyer> buyers = new ArrayList<>();
-        String sql = "SELECT u.nume, u.cnp, b.categorie_preferata " +
+        String sql = "SELECT u.id_user AS id_buyer, u.nume, u.cnp, b.categorie_preferata " +
                 "FROM utilizator u JOIN utilizator_buyer b ON u.id_user = b.id_buyer";
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -79,12 +87,16 @@ public class BuyerRepository implements Repository<Buyer, Integer> {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                buyers.add(new Buyer(
+                Buyer buyer = new Buyer(
                         rs.getString("nume"),
                         rs.getString("cnp"),
                         Categorie.valueOf(rs.getString("categorie_preferata"))
-                ));
+                );
+                buyer.setId_user(rs.getInt("id_buyer")); // ✅ fix
+                buyers.add(buyer);
             }
+
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

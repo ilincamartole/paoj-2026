@@ -22,7 +22,7 @@ public class SellerRepository implements Repository<Seller, Integer> {
             try {
                 // 1. Salvăm în tabela părinte 'utilizator' și obținem ID-ul generat
                 int userId = userRepo.save(seller, conn);
-
+                seller.setId_user(userId);
                 // 2. Salvăm în tabela copil 'utilizator_seller' folosind același ID
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, userId);

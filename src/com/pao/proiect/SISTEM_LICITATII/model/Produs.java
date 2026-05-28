@@ -61,6 +61,7 @@ public class Produs implements Comparable<Produs> {
                 && categorie == produs.categorie;
     }
 
+
     @Override
     public int hashCode() {
         return Objects.hash(nume.toLowerCase(), categorie);

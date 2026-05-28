@@ -14,6 +14,7 @@ public class Oferta implements Comparable <Oferta> {
 
     }
 
+
     public int getId_oferta() {
         return id_oferta;
     }
