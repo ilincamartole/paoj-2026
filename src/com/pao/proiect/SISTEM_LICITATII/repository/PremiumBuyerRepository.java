@@ -19,29 +19,26 @@ public class PremiumBuyerRepository implements Repository<PremiumBuyer, Integer>
         String sqlPremium = "INSERT INTO utilizator_premiumbuyer (id_pBuyer, discount_rate) VALUES (?, ?)";
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection()) {
-            conn.setAutoCommit(false); // Începe tranzacția pe 3 tabele simultan
+            conn.setAutoCommit(false);
 
             try {
-                // 1. Inserează în tabela 'utilizator' prin userRepo
                 int userId = userRepo.save(pb, conn);
 
-                // 2. Inserează în tabela 'utilizator_buyer'
                 try (PreparedStatement psBuyer = conn.prepareStatement(sqlBuyer)) {
                     psBuyer.setInt(1, userId);
                     psBuyer.setString(2, pb.getCategoriePref().name());
                     psBuyer.executeUpdate();
                 }
 
-                // 3. Inserează în tabela 'utilizator_premiumbuyer'
                 try (PreparedStatement psPremium = conn.prepareStatement(sqlPremium)) {
                     psPremium.setInt(1, userId);
                     psPremium.setFloat(2, pb.getDiscountRate());
                     psPremium.executeUpdate();
                 }
 
-                conn.commit(); // Totul a funcționat, salvăm definitiv
+                conn.commit();
             } catch (SQLException e) {
-                conn.rollback(); // A picat ceva? Dăm înapoi toate cele 3 tabele!
+                conn.rollback();
                 throw e;
             }
         } catch (SQLException e) {
@@ -109,7 +106,6 @@ public class PremiumBuyerRepository implements Repository<PremiumBuyer, Integer>
 
     @Override
     public void update(PremiumBuyer pb) {
-        // Actualizăm rata de discount în tabela specifică și categoria în tabela de Buyer
         String sqlPremium = "UPDATE utilizator_premiumbuyer SET discount_rate = ? WHERE id_pBuyer = ?";
         String sqlBuyer = "UPDATE utilizator_buyer SET categorie_preferata = ? WHERE id_buyer = ?";
 
@@ -138,7 +134,6 @@ public class PremiumBuyerRepository implements Repository<PremiumBuyer, Integer>
 
     @Override
     public void delete(Integer id) {
-        // Ștergerea din tabela de bază 'utilizator' va curăța automat tabelele copil prin CASCADE
         String sql = "DELETE FROM utilizator WHERE id_user = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

@@ -192,7 +192,6 @@ import java.sql.*;
 
 public class UserService {
 
-    // 🔴 ÎNLOCUIM MAP-UL CU REPOSITORY-URILE CONCRETE
     private final BuyerRepository buyerRepo = new BuyerRepository();
     private final SellerRepository sellerRepo = new SellerRepository();
     private final PremiumBuyerRepository premiumRepo = new PremiumBuyerRepository();
@@ -213,14 +212,12 @@ public class UserService {
             return;
         }
 
-        // Validare unicitate CNP căutând în DB
         boolean exista = cautaInDBDupaCnp(user.getCnp());
         if (exista) {
             System.out.println("Eroare: Userul cu CNP " + user.getCnp() + " exista deja în sistem!");
             return;
         }
 
-        // 🔴 SALVARE DIRECTĂ ÎN TABELA CORECTĂ DIN MYSQL
         if (user instanceof PremiumBuyer) {
             premiumRepo.save((PremiumBuyer) user);
         } else if (user instanceof Buyer) {
@@ -234,7 +231,6 @@ public class UserService {
     }
 
     public void afiseazaUseri() {
-        // Colectăm toți utilizatorii din cele 3 repouri
         List<Buyer> buyers = buyerRepo.findAll();
         List<Seller> sellers = sellerRepo.findAll();
         List<PremiumBuyer> premiums = premiumRepo.findAll();
@@ -246,7 +242,6 @@ public class UserService {
     }
 
     public User cautaUser(UserType tip, String cnp) {
-        // Căutăm direct în DB în funcție de tipul cerut
         if (tip == UserType.BUYER) {
             return buyerRepo.findAll().stream().filter(u -> u.getCnp().equals(cnp)).findFirst()
                     .orElseThrow(() -> new UserInexistentException("Nu exista buyer cu acest CNP!"));
@@ -265,7 +260,6 @@ public class UserService {
         TreeMap<Categorie, Integer> counter = new TreeMap<>();
         for (Categorie c : Categorie.values()) counter.put(c, 0);
 
-        // Luăm toți cumpărătorii din DB
         List<Buyer> totiBuyeri = buyerRepo.findAll();
         for (Buyer b : totiBuyeri) {
             counter.put(b.getCategoriePref(), counter.get(b.getCategoriePref()) + 1);
@@ -303,7 +297,6 @@ public class UserService {
             if (participari.get(b) >= 3) {
                 PremiumBuyer pb = new PremiumBuyer(b.getNume(), b.getCnp(), b.getCategoriePref(), participari.get(b));
 
-                // 🔴 UPGRADE ÎN DB: Ștergem din tabela buyer, adăugăm în tabela premium_buyer
                 buyerRepo.delete(b.getId_user());
                 premiumRepo.save(pb);
                 nr++;
@@ -340,7 +333,6 @@ public class UserService {
         }
     }
 
-    // Metodă helper privată pentru a verifica unicitatea CNP-ului în DB
     private boolean cautaInDBDupaCnp(String cnp) {
         boolean inBuyer = buyerRepo.findAll().stream().anyMatch(u -> u.getCnp().equals(cnp));
         boolean inSeller = sellerRepo.findAll().stream().anyMatch(u -> u.getCnp().equals(cnp));

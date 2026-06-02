@@ -22,14 +22,12 @@ public class BuyerRepository implements Repository<Buyer, Integer> {
             conn.setAutoCommit(false);
 
             try {
-                // 1. salvezi utilizatorul (părinte)
                 int userId = userRepo.save(buyer, conn);
 
-                // 🔥 IMPORTANT: sincronizezi TOATE ID-URILE din obiect
-                buyer.setId_user(userId);
-                buyer.setId_user(userId); // <- AICI ERA PROBLEMA TA
 
-                // 2. salvezi buyer-ul (copil)
+                buyer.setId_user(userId);
+                buyer.setId_user(userId);
+
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, userId);
                     ps.setString(2, buyer.getCategoriePref().name());
@@ -54,7 +52,6 @@ public class BuyerRepository implements Repository<Buyer, Integer> {
                 "FROM utilizator u JOIN utilizator_buyer b ON u.id_user = b.id_buyer " +
                 "WHERE u.id_user = ?";
 
-        // Resursele (Connection, PreparedStatement, ResultSet) sunt TOATE în try-with-resources
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -92,7 +89,7 @@ public class BuyerRepository implements Repository<Buyer, Integer> {
                         rs.getString("cnp"),
                         Categorie.valueOf(rs.getString("categorie_preferata"))
                 );
-                buyer.setId_user(rs.getInt("id_buyer")); // ✅ fix
+                buyer.setId_user(rs.getInt("id_buyer"));
                 buyers.add(buyer);
             }
 
@@ -106,12 +103,13 @@ public class BuyerRepository implements Repository<Buyer, Integer> {
     @Override
     public void update(Buyer buyer) {
         String sql = "UPDATE utilizator_buyer SET categorie_preferata = ? WHERE id_buyer = ?";
-        // Notă: Aici ar trebui actualizat și numele în tabela 'utilizator' dacă e cazul, similar cu save()
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, buyer.getCategoriePref().name());
-            ps.setInt(2, buyer.getId_user()); // Asigură-te că ai un getId() în clasa model/părinte
+            ps.setInt(2, buyer.getId_user());
+
+
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -120,8 +118,7 @@ public class BuyerRepository implements Repository<Buyer, Integer> {
 
     @Override
     public void delete(Integer id) {
-        // Din cauza foreign key-ului ON DELETE CASCADE (dacă îl ai setat în SQL),
-        // stergerea din 'utilizator' va șterge automat și din 'utilizator_buyer'.
+
         String sql = "DELETE FROM utilizator WHERE id_user = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

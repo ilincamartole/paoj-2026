@@ -17,22 +17,20 @@ public class SellerRepository implements Repository<Seller, Integer> {
         String sql = "INSERT INTO utilizator_seller (id_seller, rating) VALUES (?, ?)";
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection()) {
-            conn.setAutoCommit(false); // Pornim tranzacția
+            conn.setAutoCommit(false);
 
             try {
-                // 1. Salvăm în tabela părinte 'utilizator' și obținem ID-ul generat
                 int userId = userRepo.save(seller, conn);
                 seller.setId_user(userId);
-                // 2. Salvăm în tabela copil 'utilizator_seller' folosind același ID
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, userId);
                     ps.setDouble(2, seller.getRating());
                     ps.executeUpdate();
                 }
 
-                conn.commit(); // Salvăm totul în DB dacă nu au fost erori
+                conn.commit();
             } catch (SQLException e) {
-                conn.rollback(); // Dăm înapoi TOT în caz de eșec
+                conn.rollback();
                 throw e;
             }
         } catch (SQLException e) {
@@ -57,7 +55,7 @@ public class SellerRepository implements Repository<Seller, Integer> {
                             rs.getString("cnp"),
                             rs.getDouble("rating")
                     );
-                    seller.setId_user(id); // Setează ID-ul moștenit de la User
+                    seller.setId_user(id);
                     return Optional.of(seller);
                 }
             }
@@ -108,8 +106,7 @@ public class SellerRepository implements Repository<Seller, Integer> {
 
     @Override
     public void delete(Integer id) {
-        // Ștergerea din 'utilizator' va șterge automat și din 'utilizator_seller'
-        // datorită cheii străine cu ON DELETE CASCADE din SQL.
+
         String sql = "DELETE FROM utilizator WHERE id_user = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

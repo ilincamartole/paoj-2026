@@ -143,7 +143,6 @@ import com.pao.proiect.SISTEM_LICITATII.utils.DatabaseConnection;
 
 public class LicitatieService {
 
-    // 🔴 ÎNLOCUIM LISTA INTERNĂ CU REPOSITORY-URI
     private final LicitatieRepository licitatieRepo = new LicitatieRepository();
     private final OfertaRepository ofertaRepo = new OfertaRepository();
 
@@ -157,7 +156,7 @@ public class LicitatieService {
         return Holder.INSTANCE;
     }
 
-    // Returnează toate licitațiile direct din baza de date
+
     public List<Licitatie> getLicitatii() {
         return licitatieRepo.findAll();
     }
@@ -173,7 +172,6 @@ public class LicitatieService {
             throw new IllegalArgumentException("Produsul trebuie sa aiba un seller asociat!");
         }
 
-        // 🔴 SALVARE ÎN DB prin repository (Repo se ocupă și de generarea ID-ului)
         licitatieRepo.save(licitatie);
         AuditService.getInstance().log("creare_licitatie");
         System.out.println("Am salvat în DB Licitatia: " + licitatie);
@@ -280,12 +278,10 @@ public class LicitatieService {
             throw new OfertaInvalidaException("Oferta prea mica!");
         }
 
-        // 🔥 AICI trebuie să te asiguri că buyer are ID valid
         if (o.getBuyer() == null || o.getBuyer().getId_user() == 0) {
             throw new IllegalStateException("Buyer invalid sau nesalvat in DB!");
         }
 
-        // 🔴 SALVARE OFERTĂ ÎN DB
         ofertaRepo.save(o);
         AuditService.getInstance().log("lanseaza_oferta");
 
@@ -300,7 +296,6 @@ public class LicitatieService {
             throw new NuExistaAceastaLicitatie("Nu exista aceasta licitatie! Incercati alt id?");
         }
 
-        // 🔴 ȘTERGERE DIN DB
         licitatieRepo.delete(id);
         AuditService.getInstance().log("stergere_licitatie");
 
@@ -312,7 +307,7 @@ public class LicitatieService {
             throw new IllegalArgumentException("Numele cautat nu poate fi gol!");
         }
 
-        List<Licitatie> toate = licitatieRepo.findAll(); // Citire din DB
+        List<Licitatie> toate = licitatieRepo.findAll();
         boolean ok = false;
         for (Licitatie l : toate) {
             if (l.getProdus() != null && l.getProdus().getNume().equalsIgnoreCase(nume)) {
@@ -328,7 +323,7 @@ public class LicitatieService {
     }
 
     public void afiseazaLicitatiiSortate() {
-        List<Licitatie> copy = licitatieRepo.findAll(); // Citire din DB proaspătă
+        List<Licitatie> copy = licitatieRepo.findAll();
         copy.sort(Comparator.comparingInt((Licitatie l) -> l.getOferte().length).reversed());
 
         for (Licitatie c : copy) {
@@ -354,7 +349,6 @@ public class LicitatieService {
         try {
             conn = DatabaseConnection.getInstance().getConnection();
 
-            // Afisam castigatorul INAINTE de stergere
             try (PreparedStatement pstmt = conn.prepareStatement(sqlCastigator)) {
                 pstmt.setInt(1, id);
                 try (ResultSet rs = pstmt.executeQuery()) {
@@ -369,7 +363,6 @@ public class LicitatieService {
                 }
             }
 
-            // Tranzactie: stergem ofertele si licitatia
             conn.setAutoCommit(false);
             try {
                 try (PreparedStatement pstmt = conn.prepareStatement(sqlDeleteOferte)) {

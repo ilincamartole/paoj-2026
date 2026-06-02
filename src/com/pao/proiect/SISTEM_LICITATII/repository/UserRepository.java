@@ -5,7 +5,6 @@ import java.sql.*;
 
 public class UserRepository {
 
-    // IMPORTANT: Primim conexiunea de la Repository-ul copil pentru a păstra tranzacția intactă
     public int save(User user, Connection conn) throws SQLException {
         String sql = "INSERT INTO utilizator (nume, cnp) VALUES (?, ?)";
 

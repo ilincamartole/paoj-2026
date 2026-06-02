@@ -9,19 +9,15 @@ import java.util.Properties;
 
 public final class DatabaseConnection {
 
-    // 1. Instanța unică (Singleton)
     private static DatabaseConnection instance;
 
-    // Păstrăm doar parametrii de configurare în instanță
     private String url;
     private String user;
     private String pass;
 
-    // 2. Constructor privat — prinde toate excepțiile intern ca să fie curat în exterior
     private DatabaseConnection() {
         Properties props = new Properties();
 
-        // Citim db.properties din resources/
         try (InputStream is = getClass().getClassLoader().getResourceAsStream("db.properties")) {
             if (is == null) {
                 throw new IOException("Nu s-a găsit fișierul db.properties în folderul resources/");
@@ -32,7 +28,6 @@ public final class DatabaseConnection {
             this.user = props.getProperty("db.user");
             this.pass = props.getProperty("db.password");
 
-            // Încărcăm explicit driverul de MySQL pentru siguranță
             Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("[DB] Configurația bazei de date a fost încărcată cu succes!");
 

@@ -25,7 +25,6 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
 
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    // Setează ID-ul generat direct în obiectul Licitatie primit ca parametru
                     licitatie.setId_licitatie(generatedKeys.getInt(1));
                 }
             }
@@ -37,7 +36,6 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
 
     @Override
     public Optional<Licitatie> findById(Integer id) {
-        // 🔴 CORECTAT: Interogare completă cu JOIN-uri pentru reconstrucția structurii de obiecte
         String sql = "SELECT l.id_licitatie, l.min_value, " +
                 "       p.id_produs, p.nume AS nume_produs, p.categorie, p.colectie, " +
                 "       u.id_user, u.nume AS nume_seller, u.cnp, s.rating " +
@@ -53,7 +51,6 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    // 1. Reconstruim Seller-ul
                     Seller seller = new Seller(
                             rs.getString("nume_seller"),
                             rs.getString("cnp"),
@@ -61,7 +58,6 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
                     );
                     seller.setId_user(rs.getInt("id_user"));
 
-                    // 2. Reconstruim Produsul
                     Produs produs = new Produs(
                             rs.getString("nume_produs"),
                             Categorie.valueOf(rs.getString("categorie").toUpperCase()),
@@ -70,7 +66,8 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
                     );
                     produs.setId_produs(rs.getInt("id_produs"));
 
-                    // 3. Reconstruim Licitația complet, fără câmpuri null
+
+
                     Licitatie l = new Licitatie(produs, rs.getLong("min_value"));
                     l.setId_licitatie(rs.getInt("id_licitatie"));
                     return Optional.of(l);
@@ -85,7 +82,6 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
     @Override
     public List<Licitatie> findAll() {
         List<Licitatie> list = new ArrayList<>();
-        // 🔴 CORECTAT: Interogare completă pentru a popula listările din meniu
         String sql = "SELECT l.id_licitatie, l.min_value, " +
                 "       p.id_produs, p.nume AS nume_produs, p.categorie, p.colectie, " +
                 "       u.id_user, u.nume AS nume_seller, u.cnp, s.rating " +
@@ -99,7 +95,6 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
-                // 1. Reconstruim Seller-ul
                 Seller seller = new Seller(
                         rs.getString("nume_seller"),
                         rs.getString("cnp"),
@@ -107,7 +102,6 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
                 );
                 seller.setId_user(rs.getInt("id_user"));
 
-                // 2. Reconstruim Produsul
                 Produs produs = new Produs(
                         rs.getString("nume_produs"),
                         Categorie.valueOf(rs.getString("categorie").toUpperCase()),
@@ -116,7 +110,6 @@ public class LicitatieRepository implements Repository<Licitatie, Integer> {
                 );
                 produs.setId_produs(rs.getInt("id_produs"));
 
-                // 3. Reconstruim Licitația completă
                 Licitatie l = new Licitatie(produs, rs.getLong("min_value"));
                 l.setId_licitatie(rs.getInt("id_licitatie"));
                 list.add(l);
@@ -164,13 +157,11 @@ public void delete(Integer id) {
         conn.setAutoCommit(false);
 
         try {
-            // Operatie 1: stergi ofertele asociate
             try (PreparedStatement pstmt = conn.prepareStatement(sqlDeleteOferte)) {
                 pstmt.setInt(1, id);
                 pstmt.executeUpdate();
             }
 
-            // Operatie 2: stergi licitatia
             try (PreparedStatement pstmt = conn.prepareStatement(sqlDeleteLicitatie)) {
                 pstmt.setInt(1, id);
                 pstmt.executeUpdate();

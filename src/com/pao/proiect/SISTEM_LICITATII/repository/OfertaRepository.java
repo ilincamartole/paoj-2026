@@ -12,31 +12,7 @@ import java.util.Optional;
 
 public class OfertaRepository implements Repository<Oferta, Integer> {
 
-//    @Override
-//    public void save(Oferta oferta) {
-//        String sql = "INSERT INTO oferta (valoare, id_buyer, id_licitatie) VALUES (?, ?, ?)";
-//        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-//             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-//
-//            pstmt.setInt(1, oferta.getValoare());
-//            pstmt.setInt(2, oferta.getBuyer().getId_user());       // ID-ul moștenit de Buyer de la User
-//            pstmt.setInt(3, oferta.getIdLicitatie());         // 🔴 Luat direct din obiectul Oferta!
-//            System.out.println("=== DEBUG OFERTA ===");
-//            System.out.println("Buyer ID: " + oferta.getBuyer().getId_user());
-//            System.out.println("Licitatie ID: " + oferta.getIdLicitatie());
-//            System.out.println("Valoare: " + oferta.getValoare());
-//            pstmt.executeUpdate();
-//
-//            try(ResultSet generatedKeys = pstmt.getGeneratedKeys()){
-//                if (generatedKeys.next()) {
-//                    // Setează ID-ul generat direct în obiectul Licitatie primit ca parametru
-//                    oferta.setId_oferta(generatedKeys.getInt(1));
-//                }
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
+
 
     @Override
     public void save(Oferta oferta) {
@@ -46,10 +22,9 @@ public class OfertaRepository implements Repository<Oferta, Integer> {
         Connection conn = null;
         try {
             conn = DatabaseConnection.getInstance().getConnection();
-            conn.setAutoCommit(false); // ✅ dezactivam commit automat
+            conn.setAutoCommit(false);
 
             try {
-                // Operatie 1: inserezi oferta
                 try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)) {
                     pstmt.setInt(1, oferta.getValoare());
                     pstmt.setInt(2, oferta.getBuyer().getId_user());
@@ -63,20 +38,19 @@ public class OfertaRepository implements Repository<Oferta, Integer> {
                     }
                 }
 
-                // Operatie 2: actualizezi min_value in licitatie
                 try (PreparedStatement pstmt = conn.prepareStatement(sqlUpdate)) {
                     pstmt.setInt(1, oferta.getValoare());
                     pstmt.setInt(2, oferta.getIdLicitatie());
                     pstmt.executeUpdate();
                 }
 
-                conn.commit(); // ✅ ambele au reusit
+                conn.commit();
 
             } catch (SQLException e) {
-                conn.rollback(); // ✅ ceva a esuat, anulam tot
+                conn.rollback();
                 throw e;
             } finally {
-                conn.setAutoCommit(true); // ✅ restauram comportamentul implicit
+                conn.setAutoCommit(true);
             }
 
         } catch (SQLException e) {
@@ -101,7 +75,6 @@ public class OfertaRepository implements Repository<Oferta, Integer> {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    // Reconstituim obiectul citit din baza de date
                     Oferta o = new Oferta(rs.getInt("valoare"), null, rs.getInt("id_licitatie"));
                     o.setId_oferta(rs.getInt("id_oferta"));
                     return Optional.of(o);
